@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.css" type="text/css" />
+    <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.js"></script>
+    {{ script | safe }}
+  </head>
+  <body>
+    <div class=page>
+      <h1></h1>
+      <p>This is a subset of {{ records }} records for devices containing the word "Catheter" from the OpenFDA device adverse event database</p>
+      {{ div | safe }}
+    </div>
+
+  </body>
+</html>

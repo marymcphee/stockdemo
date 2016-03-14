@@ -1,13 +1,25 @@
 <html>
   <head>
-    <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.css" type="text/css" />
-    <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.js"></script>
+    <link
+    href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.css"
+    rel="stylesheet" type="text/css">
+<script src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.js"></script>
     {{ script | safe }}
   </head>
   <body>
     <div class=page>
       <h1></h1>
-      <p>This is a subset of {{ records }} records for devices containing the word "Catheter" from the OpenFDA device adverse event database</p>
+      <p>This is the full range of the dates available for {{ ticker }} {{ check }} from the Quandl dataset. Please select your desired time period below</p>
+      <p>
+        <form id="input" method="post" action="graph">
+        Enter a date after {{ thismin }}:
+        <input type="date" name="low" min=thismin><br>
+        Enter a date before {{ thismax }}:
+        <input type="date" name="high" max=thismax><br>
+        <input type="submit" value="submit">
+        </form>
+      </p>
+
       {{ div | safe }}
     </div>
 

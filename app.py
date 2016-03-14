@@ -1,9 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect
+import requests
+import pandas as pd
+import numpy as np
+import bokeh
+from bokeh.embed import components
+from bokeh.plotting import figure, show, output_server
+from datetime import datetime
+#from werkzeug.contrib.cache import SimpleCache
+
+#cache = SimpleCache()
 
 
 app = Flask(__name__)
 
 app.vars={}
+app.df = pd.DataFrame()
+
 
 @app.route('/')
 def main():
@@ -11,36 +23,73 @@ def main():
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-	#nquestions=app_lulu.nquestions
+
 	if request.method == 'GET':
 		return render_template('/index.html')
-		#return render_template('userinfo_lulu.html',num=nquestions)
+
 	else:
-		#app.vars['ticker'] = request.form['ticker']
-		ticker = request.form['ticker']
-		url = 'https://www.quandl.com/api/v3/datasets/WIKI/%s.csv?auth_token=LqDUrvRFHsCs1bYDLqPP' % (ticker)
+
+		app.vars['ticker'] = request.form['ticker']
+		url = 'https://www.quandl.com/api/v3/datasets/WIKI/%s.json?auth_token=LqDUrvRFHsCs1bYDLqPP' % (app.vars['ticker'])
 		session = requests.Session()
 		session.mount('http://', requests.adapters.HTTPAdapter(max_retries=3))
-			#for url in app.fdaurls:
-			#sleep(.25)
-		api_url = url
-			#app.responses.append(session.get(api_url))
-		sesh = session.get(api_url)
-			
-		#second = app.responses
-		pony=sesh.json()
-		pony['dataset']
-		pony2=pd.DataFrame(pony['dataset']['data'])
-		pony2.columns=pony['dataset']['column_names']
-		cache.set('data', pony2, timeout=5 * 60)
+		sesh = session.get(url)
+		injson=sesh.json()
+		app.df=pd.DataFrame(injson['dataset']['data'])
+		app.df.columns=injson['dataset']['column_names']
+		return redirect('/graph')
 
-		return render_template('/index.html', sesh=sesh)
 
-@app.route('/graph')
+@app.route('/graph', methods=['GET', 'POST'])
 def this_graph():
-	script, div = components(plot)
-	return render_template('graph.html',script=script, div=div)
+
+	data = app.df
+	ticker =app.vars['ticker']
+
+	def makedate(x):
+		return np.array(x, dtype=np.datetime64)
 
 
+	
+	if request.method == 'GET':
+		thismax = max(data['Date'])
+		thismin = min(data['Date'])
+		app.maxdate = datetime.strptime(thismax, '%Y-%m-%d').strftime("%m/%d/%Y")
+		app.mindate = datetime.strptime(thismin, '%Y-%m-%d').strftime("%m/%d/%Y")
+
+
+		p1 = figure(x_axis_type = "datetime")
+		p1.title = "Adjusted Closing Price"
+		p1.grid.grid_line_alpha=0.3
+		p1.xaxis.axis_label = 'Date'
+		p1.yaxis.axis_label = 'Price'
+
+		p1.line(makedate(data['Date']), data['Adj. Close'],  color='#A6CEE3', legend=ticker)
+
+		show(p1)
+	else:
+		low = request.form['low']
+		high = request.form['high']
+		data['Date'] = makedate(data['Date'])
+		toplot = data[(data['Date']<=high) & (data['Date']>=low)]
+			#&data['Date']<high)]
+
+		p1 = figure(x_axis_type = "datetime")
+		p1.title = "Adjusted Closing Price"
+		p1.grid.grid_line_alpha=0.3
+		p1.xaxis.axis_label = 'Date'
+		p1.yaxis.axis_label = 'Price'
+
+		p1.line(toplot['Date'], toplot['Adj. Close'],  color='#A6CEE3', legend=ticker)
+
+		show(p1)
+
+
+	script, div = components(p1)
+	return render_template('graph.html', thismin=app.mindate, thismax=app.maxdate, script=script, div=div, ticker=ticker)
+
+
+
+##REMOVE DEBUG BEFORE DEPLOYING
 if __name__ == '__main__':
   app.run(port=33507)

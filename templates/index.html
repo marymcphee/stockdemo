@@ -8,25 +8,26 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	</head>
 	<body>
-		<div>
-  			<h1>Hello, World!</h1>
-  		</div>
   		<div>
   			<h1>Select a Ticker Symbol</h1>
-  			<h3>Please enter a valid ticker symbol and select graph features</h3>
+  			<h3>Data from the <a><href=https://www.quandl.com/data/WIKI/documentation/documentation>Quandl API</a><br> Please enter a valid stock ticker symbol below</h3>
+  		<!-- 	and select chart features -->
   			<form id="input" method="post" action="index">
-  			<p>"Input Ticker:"
+  			<p>Input Ticker:
   				<input type="text" name="ticker">
-  			</p>
-  			<p>
-  				<input type="checkbox" name="samename" value="MA">
-  				"Moving Average--add more of these options with samename for value"
   				<input type="submit" value="submit">
   			</p>
 
+<!--   			<p>
+  				<input type="checkbox" name="samename" value="MA">
+  				"Moving Average--add more of these options with samename for value"
+  				<input type="submit" value="submit">
+  			</p> -->
+
   			</form>
-  			<p>Here's some data {{ sesh }} wrapping it</p>
-  			<!-- <a href=/graph>DATA</a> -->
+  			<!-- <p><a href=/graph>CLICK FOR GRAPH</a></p> -->
+  			
+
 		
 		</div>
 	</body>
